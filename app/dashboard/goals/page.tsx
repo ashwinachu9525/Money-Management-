@@ -1,8 +1,12 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { getGoals } from "@/actions/goals";
 import { AddGoalDialog } from "@/components/dashboard/add-goal-dialog";
 import { EditGoalDialog } from "@/components/dashboard/edit-goal-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Target, Trophy, TrendingUp, Calendar as CalendarIcon, Clock } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
@@ -12,6 +16,11 @@ export default async function GoalsPage({
 }: {
   searchParams: Promise<{ month?: string; year?: string; filter?: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
+
   const resolvedSearchParams = await searchParams;
   const rawGoals = await getGoals();
   const goals = JSON.parse(JSON.stringify(rawGoals)) as any[];
@@ -78,9 +87,12 @@ export default async function GoalsPage({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-4">
         {filteredGoals.map((goal) => {
-          const progress = Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
-          const daysLeft = differenceInDays(new Date(goal.targetDate), new Date());
-          const remainingAmount = goal.targetAmount - goal.currentAmount;
+          const targetAmount = Number(goal.targetAmount) || 0;
+          const currentAmount = Number(goal.currentAmount) || 0;
+          const progress = targetAmount > 0 ? Math.min((currentAmount / targetAmount) * 100, 100) : 0;
+          const targetDateObj = goal.targetDate ? new Date(goal.targetDate) : new Date();
+          const daysLeft = !isNaN(targetDateObj.getTime()) ? differenceInDays(targetDateObj, new Date()) : 0;
+          const remainingAmount = targetAmount - currentAmount;
           
           return (
             <Card key={goal.id} className="relative overflow-hidden group hover:shadow-md transition-shadow border-zinc-200 dark:border-zinc-800 flex flex-col">

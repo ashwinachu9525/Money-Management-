@@ -64,6 +64,20 @@ export default async function ReportsPage({
     },
   });
 
+  // Credit card statements for the month
+  const creditCardStatements = await prisma.creditCardStatement.findMany({
+    where: {
+      creditCard: {
+        userId: session.user.id,
+      },
+      month: month + 1, // month is 0-indexed in JS, but we store 1-12 in DB
+      year: year,
+    },
+    include: {
+      creditCard: true,
+    },
+  });
+
   // Consolidate into a single serialized array
   const transactions = [
     ...incomes.map(i => ({
@@ -95,6 +109,13 @@ export default async function ReportsPage({
       amount: emi.emiAmount,
       date: startDate.toISOString(), // Represented in the current month
       type: "emi" as const,
+    })),
+    ...creditCardStatements.map(stmt => ({
+      id: stmt.id,
+      name: `${stmt.creditCard.bank} - ${stmt.creditCard.name} Statement`,
+      amount: stmt.statementAmount,
+      date: new Date(stmt.year, stmt.month - 1, stmt.creditCard.dueDate).toISOString(),
+      type: "bill" as const, // Treat as bill for the report
     })),
   ];
 

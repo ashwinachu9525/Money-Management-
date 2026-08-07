@@ -1,9 +1,11 @@
 "use client";
 
-import { Bell, User, LogOut, Settings } from "lucide-react";
+import { useState } from "react";
+import { Bell, User, LogOut, Settings, Menu } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { FullMobileMenu } from "@/components/dashboard/full-mobile-menu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,18 +16,33 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
   const router = useRouter();
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white dark:bg-zinc-950 px-4 md:px-6">
-      <div className="flex flex-1 items-center gap-4">
+      <div className="flex flex-1 items-center gap-3">
+        {/* Mobile menu trigger */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open Navigation Menu"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+        
         {/* App name shown on mobile where sidebar is hidden */}
         <span className="font-semibold text-base md:hidden">Money Manager</span>
         <p className="text-sm text-muted-foreground hidden md:block">
           Welcome back, <span className="font-medium text-foreground">{session?.user?.name || "User"}</span>
         </p>
       </div>
+
+      {/* Full Mobile Slide-out Menu */}
+      <FullMobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" className="relative" title="Notifications">
           <Bell className="h-5 w-5" />

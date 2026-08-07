@@ -22,6 +22,7 @@ model User {
   goals         Goal[]
   aiInsights    AIInsight[]
   notifications Notification[]
+  creditCards   CreditCard[]
 }
 
 model Income {
@@ -147,4 +148,33 @@ model Notification {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CreditCard {
+  id               String                @id @default(cuid())
+  userId           String
+  bank             String
+  name             String
+  last4Digits      String
+  creditLimit      Float
+  billingCycleDate Int
+  dueDate          Int
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  user             User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  statements       CreditCardStatement[]
+}
+
+model CreditCardStatement {
+  id              String     @id @default(cuid())
+  creditCardId    String
+  month           Int
+  year            Int
+  statementAmount Float
+  minimumDue      Float
+  status          String     // 'PENDING', 'PAID_MINIMUM', 'PAID_FULL'
+  paidAmount      Float      @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  creditCard      CreditCard @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
 }

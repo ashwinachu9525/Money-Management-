@@ -12,6 +12,7 @@ import {
   Sparkles,
   Settings,
   BarChart4,
+  Landmark,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,8 +34,13 @@ const routes = [
   },
   {
     label: "EMI & Loans",
-    icon: CreditCard,
+    icon: Landmark,
     href: "/dashboard/emi",
+  },
+  {
+    label: "Credit Cards",
+    icon: CreditCard,
+    href: "/dashboard/credit-cards",
   },
   {
     label: "Bills",
