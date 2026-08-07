@@ -1,9 +1,10 @@
 import { getExpenses } from "@/actions/expenses";
+import { getBankAccounts } from "@/actions/bank-accounts";
 import { AddExpenseDialog } from "@/components/dashboard/add-expense-dialog";
 import { EditExpenseDialog } from "@/components/dashboard/edit-expense-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Receipt, ArrowDownRight, Calendar as CalendarIcon, Repeat } from "lucide-react";
+import { Receipt, ArrowDownRight, Calendar as CalendarIcon, Repeat, Landmark } from "lucide-react";
 import { format } from "date-fns";
 
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
@@ -15,7 +16,9 @@ export default async function ExpensesPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const rawExpenses = await getExpenses();
+  const rawAccounts = await getBankAccounts();
   const expenses = JSON.parse(JSON.stringify(rawExpenses)) as any[];
+  const accounts = JSON.parse(JSON.stringify(rawAccounts)) as any[];
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
@@ -52,7 +55,7 @@ export default async function ExpensesPage({
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
-          <AddExpenseDialog />
+          <AddExpenseDialog accounts={accounts} />
         </div>
       </div>
 
@@ -116,6 +119,12 @@ export default async function ExpensesPage({
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-zinc-900 dark:text-zinc-100">{expense.category}</span>
+                      {expense.bankAccount && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-700 dark:text-zinc-300">
+                          <Landmark className="h-3 w-3 text-blue-500" />
+                          {expense.bankAccount.bankName} ({expense.bankAccount.accountNick})
+                        </span>
+                      )}
                       {expense.isRecurring && (
                         <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
                           <Repeat className="h-3 w-3 mr-1" /> Recurring
@@ -135,7 +144,7 @@ export default async function ExpensesPage({
                       -₹{expense.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                     <div className="flex gap-1">
-                      <EditExpenseDialog expense={expense} />
+                      <EditExpenseDialog expense={expense} accounts={accounts} />
                       <DeleteButton id={expense.id} itemType="Expense" />
                     </div>
                   </div>
@@ -148,6 +157,7 @@ export default async function ExpensesPage({
                 <thead className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>
                     <th className="px-6 py-3 font-medium">Category</th>
+                    <th className="px-6 py-3 font-medium">Bank Account</th>
                     <th className="px-6 py-3 font-medium">Notes</th>
                     <th className="px-6 py-3 font-medium">Date</th>
                     <th className="px-6 py-3 font-medium text-right">Amount</th>
@@ -166,6 +176,16 @@ export default async function ExpensesPage({
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {expense.bankAccount ? (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                            <Landmark className="h-3.5 w-3.5 text-blue-500" />
+                            {expense.bankAccount.bankName} ({expense.bankAccount.accountNick})
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-zinc-500">
                         {expense.notes || "-"}

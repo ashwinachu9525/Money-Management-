@@ -1,9 +1,10 @@
 import { getIncomes } from "@/actions/incomes";
+import { getBankAccounts } from "@/actions/bank-accounts";
 import { AddIncomeDialog } from "@/components/dashboard/add-income-dialog";
 import { EditIncomeDialog } from "@/components/dashboard/edit-income-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Wallet, ArrowUpRight, Calendar as CalendarIcon, Briefcase } from "lucide-react";
+import { Wallet, ArrowUpRight, Calendar as CalendarIcon, Briefcase, Repeat, Landmark } from "lucide-react";
 import { format } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
@@ -14,7 +15,9 @@ export default async function IncomesPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const rawIncomes = await getIncomes();
+  const rawAccounts = await getBankAccounts();
   const incomes = JSON.parse(JSON.stringify(rawIncomes)) as any[];
+  const accounts = JSON.parse(JSON.stringify(rawAccounts)) as any[];
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
 
@@ -48,7 +51,7 @@ export default async function IncomesPage({
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
-          <AddIncomeDialog />
+          <AddIncomeDialog accounts={accounts} />
         </div>
       </div>
 
@@ -106,6 +109,17 @@ export default async function IncomesPage({
                       <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
                         {income.category}
                       </span>
+                      {income.bankAccount && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-700 dark:text-zinc-300">
+                          <Landmark className="h-3 w-3 text-blue-500" />
+                          {income.bankAccount.bankName} ({income.bankAccount.accountNick})
+                        </span>
+                      )}
+                      {income.isRecurring && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
+                          <Repeat className="h-3 w-3" /> Recurring
+                        </span>
+                      )}
                       <span className="text-xs text-zinc-400 flex items-center">
                         <CalendarIcon className="h-3 w-3 mr-1" />
                         {format(new Date(income.date), "MMM d, yyyy")}
@@ -117,7 +131,7 @@ export default async function IncomesPage({
                       +₹{income.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                     </span>
                     <div className="flex gap-1">
-                      <EditIncomeDialog income={income} />
+                      <EditIncomeDialog income={income} accounts={accounts} />
                       <DeleteButton id={income.id} itemType="Income" />
                     </div>
                   </div>
@@ -131,6 +145,7 @@ export default async function IncomesPage({
                   <tr>
                     <th className="px-6 py-3 font-medium">Source / Company</th>
                     <th className="px-6 py-3 font-medium">Category</th>
+                    <th className="px-6 py-3 font-medium">Bank Account</th>
                     <th className="px-6 py-3 font-medium">Date</th>
                     <th className="px-6 py-3 font-medium text-right">Amount</th>
                     <th className="px-6 py-3 font-medium text-right">Action</th>
@@ -149,9 +164,26 @@ export default async function IncomesPage({
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-                          {income.category}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                            {income.category}
+                          </span>
+                          {income.isRecurring && (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400">
+                              <Repeat className="h-3 w-3" /> Recurring
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {income.bankAccount ? (
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-800 dark:text-zinc-200">
+                            <Landmark className="h-3.5 w-3.5 text-blue-500" />
+                            {income.bankAccount.bankName} ({income.bankAccount.accountNick})
+                          </span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 text-zinc-500">
                         <div className="flex items-center">

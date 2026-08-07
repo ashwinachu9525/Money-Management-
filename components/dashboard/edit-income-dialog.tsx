@@ -27,15 +27,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { updateIncome } from "@/actions/incomes";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 type SerializedIncome = {
   id: string;
   userId: string;
+  bankAccountId?: string | null;
   sourceName: string;
   companyName: string | null;
   category: string;
   amount: number;
   date: string;
   notes: string | null;
+  isRecurring: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -47,11 +52,13 @@ const incomeSchema = z.object({
   amount: z.coerce.number().min(1, "Amount must be greater than 0"),
   date: z.string().min(1, "Date is required"),
   notes: z.string().optional(),
+  isRecurring: z.boolean().default(false),
+  bankAccountId: z.string().optional(),
 });
 
 type IncomeFormValues = z.infer<typeof incomeSchema>;
 
-export function EditIncomeDialog({ income }: { income: SerializedIncome }) {
+export function EditIncomeDialog({ income, accounts = [] }: { income: SerializedIncome; accounts?: any[] }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,6 +71,8 @@ export function EditIncomeDialog({ income }: { income: SerializedIncome }) {
       amount: income.amount,
       date: income.date.split("T")[0],
       notes: income.notes || "",
+      isRecurring: income.isRecurring || false,
+      bankAccountId: income.bankAccountId || "",
     },
   });
 
@@ -171,6 +180,32 @@ export function EditIncomeDialog({ income }: { income: SerializedIncome }) {
                 )}
               />
             </div>
+            {accounts.length > 0 && (
+              <FormField
+                control={form.control}
+                name="bankAccountId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Deposit to Bank Account (Optional)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bank account..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {accounts.map((acc: any) => (
+                          <SelectItem key={acc.id} value={acc.id}>
+                            {acc.bankName} ({acc.accountNick} - •••{acc.last5Digits})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="notes"
@@ -181,6 +216,27 @@ export function EditIncomeDialog({ income }: { income: SerializedIncome }) {
                     <Textarea placeholder="Any additional details..." disabled={isLoading} {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="isRecurring"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-3">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="cursor-pointer">Recurring Income</FormLabel>
+                    <p className="text-xs text-muted-foreground">
+                      Mark if this is a recurring monthly income (e.g. Salary, Rent)
+                    </p>
+                  </div>
                 </FormItem>
               )}
             />

@@ -31,7 +31,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const expenseCategories = [
-  "EMI", "Rent", "Electricity Bill", "Water Bill", "Internet", 
+  "EMI", "Rent", "Family Support", "Electricity Bill", "Water Bill", "Internet", 
   "Fuel", "Grocery", "Shopping", "Food", "Travel", 
   "Insurance", "Healthcare", "Education", "Entertainment", "Miscellaneous"
 ];
@@ -42,11 +42,12 @@ const expenseSchema = z.object({
   date: z.string().min(1, "Date is required"),
   notes: z.string().optional(),
   isRecurring: z.boolean().default(false),
+  bankAccountId: z.string().optional(),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseSchema>;
 
-export function AddExpenseDialog() {
+export function AddExpenseDialog({ accounts = [] }: { accounts?: any[] }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,6 +59,7 @@ export function AddExpenseDialog() {
       date: new Date().toISOString().split("T")[0],
       notes: "",
       isRecurring: false,
+      bankAccountId: "",
     },
   });
 
@@ -149,6 +151,32 @@ export function AddExpenseDialog() {
                 )}
               />
             </div>
+            {accounts.length > 0 && (
+              <FormField
+                control={form.control}
+                name="bankAccountId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Paid From Bank Account (Optional)</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select bank account..." />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {accounts.map((acc: any) => (
+                          <SelectItem key={acc.id} value={acc.id}>
+                            {acc.bankName} ({acc.accountNick} - •••{acc.last5Digits})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             <FormField
               control={form.control}
               name="notes"

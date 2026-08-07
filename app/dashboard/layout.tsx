@@ -21,9 +21,9 @@ export default async function DashboardLayout({
       <aside className="hidden md:block w-64 flex-shrink-0 z-20">
         <Sidebar />
       </aside>
-      <div className="flex flex-col flex-1 w-full min-w-0">
+      <div className="flex flex-col flex-1 w-full min-w-0 h-full overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-auto p-4 md:p-6 pb-24 md:pb-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-36 md:pb-6">
           {children}
         </main>
       </div>
