@@ -1,7 +1,7 @@
 import "dotenv/config";
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../lib/generated/prisma";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
