@@ -80,7 +80,7 @@ export default async function EMIPage() {
       </div>
 
       <Tabs defaultValue="regular" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-[400px]">
+        <TabsList className="grid w-full grid-cols-2 sm:max-w-[400px]">
           <TabsTrigger value="regular">Regular EMIs ({regularEmis.length})</TabsTrigger>
           <TabsTrigger value="pre-emi">Pre-EMIs ({preEmis.length})</TabsTrigger>
         </TabsList>

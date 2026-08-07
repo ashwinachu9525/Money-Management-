@@ -3,6 +3,7 @@ import { AddBillDialog } from "@/components/dashboard/add-bill-dialog";
 import { EditBillDialog } from "@/components/dashboard/edit-bill-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Receipt, Calendar as CalendarIcon, CheckCircle2, Clock, Zap } from "lucide-react";
 import { format, isPast, isToday } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
@@ -43,7 +44,7 @@ export default async function BillsPage({
             Manage your utility bills and credit card payments.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
           <AddBillDialog />
         </div>
@@ -132,7 +133,34 @@ export default async function BillsPage({
             <CheckCircle2 className="mr-2 h-5 w-5 text-emerald-500" /> Paid Bills
           </h3>
           <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800 md:hidden">
+              {paidBills.map((bill) => (
+                <div key={bill.id} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{bill.name}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-zinc-400 flex items-center">
+                        <CalendarIcon className="h-3 w-3 mr-1" />
+                        {format(new Date(bill.dueDate), "MMM d, yyyy")}
+                      </span>
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
+                        Paid
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className="font-semibold text-sm">₹{bill.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                    <div className="flex gap-1">
+                      <EditBillDialog bill={bill} />
+                      <DeleteButton id={bill.id} itemType="Bill" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>

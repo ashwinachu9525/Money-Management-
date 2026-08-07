@@ -80,7 +80,7 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
   return (
     <div className="space-y-6 print:space-y-4">
       {/* Header Controls - Hidden in print */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 print:hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 print:hidden">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="icon" onClick={handlePrevMonth}>
             <ChevronLeft className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
       </div>
 
       {/* Summary Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="print:shadow-none print:border-gray-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Income</CardTitle>
@@ -153,14 +153,14 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
       </div>
 
       {/* Charts section */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
         <Card className="print:shadow-none print:border-gray-300">
           <CardHeader>
             <CardTitle>Cashflow Breakdown</CardTitle>
             <CardDescription>Income vs different types of outflows</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
+            <div className="h-[220px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={overviewData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
@@ -184,7 +184,7 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
           </CardHeader>
           <CardContent>
             {pieData.length > 0 ? (
-              <div className="h-[300px]">
+              <div className="h-[220px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

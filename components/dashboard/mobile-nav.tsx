@@ -2,7 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Wallet, Receipt, Target, PlusCircle, BarChart4 } from "lucide-react";
+import {
+  LayoutDashboard,
+  Wallet,
+  Receipt,
+  Target,
+  BarChart4,
+  CreditCard,
+  PiggyBank,
+  Sparkles,
+  Settings,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const routes = [
@@ -12,15 +22,9 @@ const routes = [
     href: "/dashboard",
   },
   {
-    label: "Incomes",
+    label: "Income",
     icon: Wallet,
     href: "/dashboard/incomes",
-  },
-  {
-    label: "Add",
-    icon: PlusCircle,
-    href: "/dashboard/add",
-    isAction: true,
   },
   {
     label: "Expenses",
@@ -43,30 +47,27 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <div className="md:hidden fixed bottom-0 w-full bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-around pb-safe">
-      {routes.map((route) => (
-        <Link
-          key={route.href}
-          href={route.href}
-          className={cn(
-            "flex flex-col items-center justify-center w-full py-3 px-2 text-xs font-medium transition-colors",
-            pathname === route.href
-              ? "text-blue-600 dark:text-blue-500"
-              : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-          )}
-        >
-          {route.isAction ? (
-            <div className="absolute -top-5 bg-blue-600 rounded-full p-3 shadow-lg border-4 border-white dark:border-zinc-950 text-white">
-              <route.icon className="h-6 w-6" />
-            </div>
-          ) : (
-            <>
-              <route.icon className="h-5 w-5 mb-1" />
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-950 border-t border-zinc-200 dark:border-zinc-800 safe-area-inset-bottom">
+      <div className="flex items-stretch justify-around h-16">
+        {routes.map((route) => {
+          const isActive = pathname === route.href;
+          return (
+            <Link
+              key={route.href}
+              href={route.href}
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 gap-1 text-[10px] font-medium transition-colors px-1",
+                isActive
+                  ? "text-blue-600 dark:text-blue-500"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+              )}
+            >
+              <route.icon className={cn("h-5 w-5", isActive ? "stroke-[2.5px]" : "")} />
               <span>{route.label}</span>
-            </>
-          )}
-        </Link>
-      ))}
-    </div>
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

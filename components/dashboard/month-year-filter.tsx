@@ -69,10 +69,10 @@ export function MonthYearFilter() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1.5">
       <Select value={selectedMonth} onValueChange={handleMonthChange}>
-        <SelectTrigger className="w-[140px] h-9">
-          <SelectValue placeholder="Select Month" />
+        <SelectTrigger className="w-[110px] sm:w-[140px] h-9 text-xs sm:text-sm">
+          <SelectValue placeholder="Month" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Months</SelectItem>
@@ -83,8 +83,8 @@ export function MonthYearFilter() {
       </Select>
 
       <Select value={selectedYear} onValueChange={handleYearChange}>
-        <SelectTrigger className="w-[100px] h-9">
-          <SelectValue placeholder="Select Year" />
+        <SelectTrigger className="w-[80px] sm:w-[100px] h-9 text-xs sm:text-sm">
+          <SelectValue placeholder="Year" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Years</SelectItem>

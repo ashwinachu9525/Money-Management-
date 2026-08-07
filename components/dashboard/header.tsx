@@ -18,8 +18,10 @@ export function Header() {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white dark:bg-zinc-950 px-6">
+    <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white dark:bg-zinc-950 px-4 md:px-6">
       <div className="flex flex-1 items-center gap-4">
+        {/* App name shown on mobile where sidebar is hidden */}
+        <span className="font-semibold text-base md:hidden">Money Manager</span>
         <p className="text-sm text-muted-foreground hidden md:block">
           Welcome back, <span className="font-medium text-foreground">{session?.user?.name || "User"}</span>
         </p>

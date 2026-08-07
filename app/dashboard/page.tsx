@@ -107,13 +107,13 @@ export default async function DashboardPage({
             Welcome back, {session?.user?.name || "User"}. Here's your financial summary.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
           <ExportButton />
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-none shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium opacity-90">Total Available Balance</CardTitle>
@@ -171,8 +171,8 @@ export default async function DashboardPage({
         </Card>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 shadow-sm border-zinc-200 dark:border-zinc-800">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-1 md:col-span-2 lg:col-span-4 shadow-sm border-zinc-200 dark:border-zinc-800">
           <CardHeader>
             <CardTitle>Income vs Expense</CardTitle>
             <CardDescription>
@@ -184,7 +184,7 @@ export default async function DashboardPage({
           </CardContent>
         </Card>
         
-        <Card className="col-span-3 shadow-sm border-zinc-200 dark:border-zinc-800">
+        <Card className="col-span-1 md:col-span-2 lg:col-span-3 shadow-sm border-zinc-200 dark:border-zinc-800">
           <CardHeader>
             <CardTitle>Recent Transactions</CardTitle>
             <CardDescription>

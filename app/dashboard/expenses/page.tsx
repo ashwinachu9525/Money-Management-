@@ -50,7 +50,7 @@ export default async function ExpensesPage({
             Monitor your spending and keep track of outgoing cash.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
           <AddExpenseDialog />
         </div>
@@ -109,7 +109,41 @@ export default async function ExpensesPage({
         
         {filteredExpenses.length > 0 ? (
           <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800 md:hidden">
+              {filteredExpenses.map((expense) => (
+                <div key={expense.id} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{expense.category}</span>
+                      {expense.isRecurring && (
+                        <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
+                          <Repeat className="h-3 w-3 mr-1" /> Recurring
+                        </span>
+                      )}
+                    </div>
+                    {expense.notes && (
+                      <p className="text-xs text-zinc-500 mt-0.5 truncate">{expense.notes}</p>
+                    )}
+                    <span className="text-xs text-zinc-400 flex items-center mt-1">
+                      <CalendarIcon className="h-3 w-3 mr-1" />
+                      {format(new Date(expense.date), "MMM d, yyyy")}
+                    </span>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className="font-semibold text-rose-600 dark:text-rose-500 text-sm">
+                      -₹{expense.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                    <div className="flex gap-1">
+                      <EditExpenseDialog expense={expense} />
+                      <DeleteButton id={expense.id} itemType="Expense" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>

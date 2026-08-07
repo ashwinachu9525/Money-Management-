@@ -4,6 +4,7 @@ import { EditIncomeDialog } from "@/components/dashboard/edit-income-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, ArrowUpRight, Calendar as CalendarIcon, Briefcase } from "lucide-react";
+import { format } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
 export default async function IncomesPage({
@@ -45,7 +46,7 @@ export default async function IncomesPage({
             Track your revenue streams and manage your cash inflows.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
           <AddIncomeDialog />
         </div>
@@ -89,7 +90,42 @@ export default async function IncomesPage({
         
         {filteredIncomes.length > 0 ? (
           <div className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm overflow-hidden">
-            <div className="overflow-x-auto">
+            {/* Mobile card list */}
+            <div className="divide-y divide-zinc-200 dark:divide-zinc-800 md:hidden">
+              {filteredIncomes.map((income) => (
+                <div key={income.id} className="flex items-center justify-between px-4 py-3 gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-zinc-900 dark:text-zinc-100 truncate">{income.sourceName}</p>
+                    {income.companyName && (
+                      <div className="flex items-center text-xs text-zinc-500 mt-0.5">
+                        <Briefcase className="h-3 w-3 mr-1 shrink-0" />
+                        <span className="truncate">{income.companyName}</span>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
+                        {income.category}
+                      </span>
+                      <span className="text-xs text-zinc-400 flex items-center">
+                        <CalendarIcon className="h-3 w-3 mr-1" />
+                        {format(new Date(income.date), "MMM d, yyyy")}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-500 text-sm">
+                      +₹{income.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </span>
+                    <div className="flex gap-1">
+                      <EditIncomeDialog income={income} />
+                      <DeleteButton id={income.id} itemType="Income" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="text-xs text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
                   <tr>

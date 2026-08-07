@@ -45,14 +45,14 @@ export default async function GoalsPage({
             Set targets, save money, and track your progress to financial freedom.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <MonthYearFilter />
           <AddGoalDialog />
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white border-none shadow-md lg:col-span-3">
+        <Card className="col-span-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 text-white border-none shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium opacity-90">Overall Savings Progress</CardTitle>
             <Trophy className="h-4 w-4 opacity-75" />
@@ -60,13 +60,13 @@ export default async function GoalsPage({
           <CardContent>
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-4">
               <div>
-                <div className="text-4xl font-bold">
+                <div className="text-2xl sm:text-4xl font-bold break-all">
                   ₹{totalSaved.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
-                  <span className="text-lg opacity-75 font-normal"> / ₹{totalTarget.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
+                  <span className="text-base sm:text-lg opacity-75 font-normal"> / ₹{totalTarget.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
                 </div>
                 <p className="text-sm opacity-80 mt-1">Total saved across {filteredGoals.length} {isAllTime ? '' : 'active'} goals</p>
               </div>
-              <div className="text-right">
+              <div className="text-left md:text-right">
                 <div className="text-2xl font-bold">{overallProgress.toFixed(1)}%</div>
                 <p className="text-sm opacity-80">completed</p>
               </div>
