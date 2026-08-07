@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  email         String         @unique
+  password      String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  incomes       Income[]
+  expenses      Expense[]
+  emis          EMI[]
+  bills         Bill[]
+  bankAccounts  BankAccount[]
+  goals         Goal[]
+  aiInsights    AIInsight[]
+  notifications Notification[]
+}
+
+model Income {
+  id          String   @id @default(cuid())
+  userId      String
+  sourceName  String
+  companyName String?
+  category    String
+  amount      Float
+  date        DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  userId      String
+  category    String
+  amount      Float
+  date        DateTime
+  notes       String?
+  isRecurring Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EMI {
+  id              String   @id @default(cuid())
+  userId          String
+  name            String
+  bank            String
+  totalLoan       Float
+  emiAmount       Float
+  startDate       DateTime
+  endDate         DateTime
+  remainingMonths Int
+  interestRate    Float
+  notes           String?
+
+  // Pre-EMI fields
+  isPreEmi           Boolean   @default(false)
+  propertyName       String?
+  sanctionDate       DateTime?
+  expectedCompletion DateTime?
+  builderName        String?
+
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slabs     DisbursementSlab[]
+}
+
+model DisbursementSlab {
+  id                String    @id @default(cuid())
+  emiId             String
+  slabNumber        Int
+  amount            Float
+  releaseDate       DateTime?
+  constructionStage String
+  remarks           String?
+  status            String // 'PENDING' or 'DISBURSED'
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  emi               EMI       @relation(fields: [emiId], references: [id], onDelete: Cascade)
+}
+
+model Bill {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  dueDate   DateTime
+  amount    Float
+  status    String // PENDING, PAID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BankAccount {
+  id          String   @id @default(cuid())
+  userId      String
+  bankName    String
+  accountNick String
+  last5Digits String
+  balance     Float
+  accountType String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  startDate     DateTime
+  targetDate    DateTime
+  priority      String // LOW, MEDIUM, HIGH
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AIInsight {
+  id        String   @id @default(cuid())
+  userId    String
+  insight   String
+  type      String // SPENDING, SAVING, BUDGET, etc.
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
