@@ -43,7 +43,7 @@ export function MobileNav() {
   return (
     <>
       <FullMobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 safe-area-inset-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border-t border-zinc-200 dark:border-zinc-800 pb-[env(safe-area-inset-bottom,0px)]">
         <div className="flex items-stretch justify-around h-16">
           {primaryRoutes.map((route) => {
             const isActive = pathname === route.href;

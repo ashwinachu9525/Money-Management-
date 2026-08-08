@@ -5,11 +5,9 @@ import { EditExpenseDialog } from "@/components/dashboard/edit-expense-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Receipt, ArrowDownRight, Calendar as CalendarIcon, Repeat, Landmark } from "lucide-react";
-import { format } from "date-fns";
-
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
-import { filterTransactionsForMonth } from "@/lib/utils";
+import { filterTransactionsForMonth, formatDate } from "@/lib/utils";
 
 export default async function ExpensesPage({
   searchParams,
@@ -133,7 +131,7 @@ export default async function ExpensesPage({
                     )}
                     <span className="text-xs text-zinc-400 flex items-center mt-1">
                       <CalendarIcon className="h-3 w-3 mr-1" />
-                      {format(new Date(expense.date), "MMM d, yyyy")}
+                      {formatDate(expense.date)}
                     </span>
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
@@ -190,7 +188,7 @@ export default async function ExpensesPage({
                       <td className="px-6 py-4 text-zinc-500">
                         <div className="flex items-center">
                           <CalendarIcon className="h-3 w-3 mr-2" />
-                          {format(new Date(expense.date), "MMM d, yyyy")}
+                          {formatDate(expense.date)}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right font-medium text-rose-600 dark:text-rose-500">

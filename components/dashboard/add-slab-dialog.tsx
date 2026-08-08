@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { addDisbursementSlab } from "@/actions/emis";
 import { Textarea } from "@/components/ui/textarea";
+import { formatIndianCurrency } from "@/lib/utils";
 
 const slabSchema = z.object({
   slabNumber: z.coerce.number().min(1, "Slab number must be at least 1"),
@@ -51,6 +52,8 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
     },
   });
 
+  const watchAmount = form.watch("amount");
+
   async function onSubmit(data: SlabFormValues) {
     setIsLoading(true);
     try {
@@ -61,7 +64,6 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
       toast.success("Disbursement slab added successfully");
       setOpen(false);
       form.reset({
-        ...form.getValues(),
         slabNumber: data.slabNumber + 1,
         amount: 0,
         constructionStage: "",
@@ -82,12 +84,12 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button variant="outline" size="sm" className="mt-4" />
+          <Button variant="outline" size="sm" className="mt-4 w-full sm:w-auto gap-2 font-semibold border-dashed border-blue-300 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50">
+            <PlusCircle className="h-4 w-4" />
+            Add Disbursement Slab
+          </Button>
         }
-      >
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add Disbursement Slab
-      </DialogTrigger>
+      />
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Disbursement Slab</DialogTitle>
@@ -120,6 +122,11 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
                     <FormControl>
                       <Input type="number" step="0.01" disabled={isLoading} {...field} />
                     </FormControl>
+                    {watchAmount > 0 && (
+                      <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">
+                        Preview: {formatIndianCurrency(watchAmount)}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}

@@ -7,9 +7,9 @@ import {
   CheckCircle2, 
   CircleDashed, 
   Clock, 
-  AlertCircle,
   TrendingUp,
-  Banknote
+  Banknote,
+  Plus
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,7 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { EditEmiDialog } from "@/components/dashboard/edit-emi-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
-import { deleteEMI, updateDisbursementSlab, convertToRegularEMI } from "@/actions/emis";
+import { updateDisbursementSlab, convertToRegularEMI } from "@/actions/emis";
 import { AddSlabDialog } from "@/components/dashboard/add-slab-dialog";
 
 type SerializedDisbursementSlab = {
@@ -60,11 +60,14 @@ type PreEmiWithSlabs = SerializedEMI & { slabs: SerializedDisbursementSlab[] };
 export function PreEmiCard({ emi }: { emi: PreEmiWithSlabs }) {
   const [isPending, startTransition] = useTransition();
 
-  const totalDisbursed = emi.slabs
-    .filter(s => s.status === "DISBURSED")
+  // Sort slabs ascending by slabNumber so Slab 1, Slab 2, Slab 3 display sequentially
+  const sortedSlabs = [...(emi.slabs || [])].sort((a, b) => a.slabNumber - b.slabNumber);
+
+  const totalDisbursed = sortedSlabs
+    .filter((s) => s.status === "DISBURSED")
     .reduce((sum, slab) => sum + slab.amount, 0);
 
-  const percentDisbursed = (totalDisbursed / emi.totalLoan) * 100;
+  const percentDisbursed = Math.min((totalDisbursed / emi.totalLoan) * 100, 100);
   
   // Auto-calculated Pre-EMI (Monthly Interest on Disbursed Amount)
   const monthlyPreEmi = (totalDisbursed * (emi.interestRate / 100)) / 12;
@@ -89,8 +92,6 @@ export function PreEmiCard({ emi }: { emi: PreEmiWithSlabs }) {
       return;
     }
 
-    // In a real scenario, you'd open a dialog to confirm the final start date, tenure, etc.
-    // For now, we'll auto-calculate a standard 20-year term to demonstrate.
     startTransition(async () => {
       try {
         const principal = emi.totalLoan;
@@ -117,30 +118,30 @@ export function PreEmiCard({ emi }: { emi: PreEmiWithSlabs }) {
     });
   };
 
-  const nextSlabNumber = emi.slabs.length > 0 
-    ? Math.max(...emi.slabs.map(s => s.slabNumber)) + 1 
+  const nextSlabNumber = sortedSlabs.length > 0 
+    ? Math.max(...sortedSlabs.map((s) => s.slabNumber)) + 1 
     : 1;
 
   return (
-    <Card className="flex flex-col relative overflow-hidden group border-zinc-200 dark:border-zinc-800">
+    <Card className="flex flex-col relative overflow-hidden group border-zinc-200 dark:border-zinc-800 shadow-sm">
       <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
         <Building2 className="h-32 w-32" />
       </div>
       
       <CardHeader className="pb-4 relative z-10">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="flex items-center space-x-2">
+        <div className="flex justify-between items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center space-x-2 flex-wrap gap-y-1">
               <Badge variant="outline" className="bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-amber-200 dark:border-amber-900">
-                Pre-EMI
+                Pre-EMI Construction Loan
               </Badge>
-              <CardTitle className="text-xl">{emi.name}</CardTitle>
+              <CardTitle className="text-xl font-bold truncate">{emi.name}</CardTitle>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 truncate">
               {emi.propertyName} {emi.builderName ? `• ${emi.builderName}` : ""}
             </p>
           </div>
-          <div className="flex space-x-1">
+          <div className="flex space-x-1 shrink-0">
             <EditEmiDialog emi={emi} />
             <DeleteButton id={emi.id} itemType="Pre-EMI Loan" />
           </div>
@@ -149,78 +150,94 @@ export function PreEmiCard({ emi }: { emi: PreEmiWithSlabs }) {
 
       <CardContent className="flex-1 pb-4 relative z-10 space-y-6">
         {/* Financial Summary */}
-        <div className="grid grid-cols-2 gap-4 bg-zinc-50 dark:bg-zinc-900/50 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 bg-zinc-50 dark:bg-zinc-900/50 p-3.5 sm:p-4 rounded-xl border border-zinc-100 dark:border-zinc-800">
           <div>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Current Pre-EMI</p>
             <div className="flex items-baseline space-x-1">
-              <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              <span className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">
                 ₹{monthlyPreEmi.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
               </span>
-              <span className="text-sm text-muted-foreground">/mo</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">/mo</span>
             </div>
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">Interest Rate</p>
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-emerald-500" />
-              <span className="text-lg font-semibold">{emi.interestRate}%</span>
+            <div className="flex items-center space-x-1.5">
+              <TrendingUp className="h-4 w-4 text-emerald-500 shrink-0" />
+              <span className="text-base sm:text-lg font-semibold">{emi.interestRate}% p.a.</span>
             </div>
           </div>
         </div>
 
         {/* Disbursement Progress */}
         <div className="space-y-2">
-          <div className="flex justify-between text-sm">
+          <div className="flex justify-between items-center text-xs sm:text-sm">
             <span className="font-medium text-muted-foreground">Disbursement Progress</span>
-            <span className="font-semibold">
+            <span className="font-semibold text-right">
               ₹{totalDisbursed.toLocaleString("en-IN")} / ₹{emi.totalLoan.toLocaleString("en-IN")}
             </span>
           </div>
-          <Progress value={percentDisbursed} className="h-2" />
+          <Progress value={percentDisbursed} className="h-2.5" />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>{percentDisbursed.toFixed(1)}% Disbursed</span>
-            <span>{emi.slabs.filter(s => s.status === "DISBURSED").length} Slabs Completed</span>
+            <span>{sortedSlabs.filter((s) => s.status === "DISBURSED").length} of {sortedSlabs.length} Slabs Released</span>
           </div>
         </div>
 
-        {/* Timeline */}
+        {/* Disbursement Slabs List */}
         <div className="space-y-3 pt-2">
-          <h4 className="text-sm font-semibold flex items-center">
-            <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
-            Disbursement Timeline
-          </h4>
-          <div className="space-y-4 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-zinc-200 dark:before:via-zinc-800 before:to-transparent">
-            {emi.slabs.map((slab) => (
-              <div key={slab.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-white dark:border-zinc-950 bg-zinc-100 dark:bg-zinc-800 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
-                  {slab.status === "DISBURSED" ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                  ) : (
-                    <CircleDashed className="h-4 w-4 text-muted-foreground" />
-                  )}
-                </div>
-                
-                <div className="w-[calc(100%-2rem)] md:w-[calc(50%-1.5rem)] p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm">
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Slab {slab.slabNumber}
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-semibold flex items-center">
+              <Clock className="h-4 w-4 mr-2 text-amber-500" />
+              Disbursement Slabs ({sortedSlabs.length})
+            </h4>
+          </div>
+
+          <div className="space-y-3">
+            {sortedSlabs.length > 0 ? (
+              sortedSlabs.map((slab) => (
+                <div
+                  key={slab.id}
+                  className={`p-3.5 rounded-xl border shadow-xs transition-colors ${
+                    slab.status === "DISBURSED"
+                      ? "border-l-4 border-l-emerald-500 border-zinc-200 dark:border-zinc-800 bg-emerald-50/20 dark:bg-emerald-950/10"
+                      : "border-l-4 border-l-amber-400 border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                        Slab {slab.slabNumber}
+                      </span>
+                      <p className="text-sm font-semibold text-foreground truncate">{slab.constructionStage}</p>
+                    </div>
+                    <span className="text-sm font-bold text-foreground shrink-0">
+                      ₹{slab.amount.toLocaleString("en-IN")}
                     </span>
-                    <span className="text-sm font-bold">₹{slab.amount.toLocaleString("en-IN")}</span>
                   </div>
-                  <p className="text-sm font-medium">{slab.constructionStage}</p>
-                  
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      {slab.status === "DISBURSED" 
-                        ? `Released on ${slab.releaseDate ? format(new Date(slab.releaseDate), "PP") : "Unknown"}`
-                        : "Pending Release"
-                      }
-                    </span>
+
+                  <div className="flex items-center justify-between text-xs mt-2 pt-2 border-t border-zinc-100 dark:border-zinc-800/60">
+                    <div className="flex items-center gap-1.5 text-muted-foreground">
+                      {slab.status === "DISBURSED" ? (
+                        <>
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                          <span className="text-emerald-700 dark:text-emerald-400 font-medium">
+                            Released {slab.releaseDate ? format(new Date(slab.releaseDate), "PP") : ""}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <CircleDashed className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                          <span className="text-amber-600 dark:text-amber-400 font-medium">Pending Release</span>
+                        </>
+                      )}
+                    </div>
+
                     {slab.status === "PENDING" && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 px-2 text-xs"
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="h-7 px-3 text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 border border-emerald-300/40"
                         disabled={isPending}
                         onClick={() => handleMarkDisbursed(slab.id)}
                       >
@@ -229,8 +246,12 @@ export function PreEmiCard({ emi }: { emi: PreEmiWithSlabs }) {
                     )}
                   </div>
                 </div>
+              ))
+            ) : (
+              <div className="p-4 text-center border border-dashed rounded-xl bg-zinc-50 dark:bg-zinc-900/40 text-xs text-muted-foreground">
+                No disbursement slabs added yet. Click below to add your first slab.
               </div>
-            ))}
+            )}
           </div>
           
           <AddSlabDialog emiId={emi.id} nextSlabNumber={nextSlabNumber} />

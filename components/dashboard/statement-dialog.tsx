@@ -76,7 +76,6 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
   const status = form.watch("status");
   const statementAmount = form.watch("statementAmount");
   const minimumDue = form.watch("minimumDue");
-  const paidAmount = form.watch("paidAmount");
 
   useEffect(() => {
     if (status === "PAID_FULL") {
@@ -115,25 +114,20 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
     }
   }
 
+  const defaultTrigger = (
+    <Button
+      variant="outline"
+      size="sm"
+      className="gap-1.5 font-semibold text-xs border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+    >
+      {isEditing ? <Edit className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+      {isEditing ? "Edit Statement" : "Add Statement"}
+    </Button>
+  );
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        render={
-          (trigger as React.ReactElement) || (
-            <Button variant="outline" size="sm">
-              {isEditing ? <Edit className="h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-              {isEditing ? "" : "Add Statement"}
-            </Button>
-          )
-        }
-      >
-        {!trigger && (
-          <>
-            {isEditing ? <Edit className="h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
-            {isEditing ? "" : "Add Statement"}
-          </>
-        )}
-      </DialogTrigger>
+      <DialogTrigger render={(trigger as React.ReactElement) || defaultTrigger} />
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Statement" : "Add Statement"}</DialogTitle>

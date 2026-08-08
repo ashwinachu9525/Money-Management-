@@ -100,7 +100,7 @@ export function FullMobileMenu({ open, onOpenChange }: FullMobileMenuProps) {
       />
 
       {/* Slide-out Panel */}
-      <div className="relative flex flex-col w-5/6 max-w-xs bg-white dark:bg-zinc-950 h-full shadow-2xl z-50 border-r border-zinc-200 dark:border-zinc-800 animate-in slide-in-from-left duration-200">
+      <div className="relative flex flex-col w-5/6 max-w-xs bg-white dark:bg-zinc-950 h-full shadow-2xl z-50 border-r border-zinc-200 dark:border-zinc-800 animate-in slide-in-from-left duration-200 pt-[env(safe-area-inset-top,0px)] pb-[env(safe-area-inset-bottom,0px)]">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center gap-2">

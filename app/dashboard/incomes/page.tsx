@@ -5,10 +5,9 @@ import { EditIncomeDialog } from "@/components/dashboard/edit-income-dialog";
 import { DeleteButton } from "@/components/dashboard/delete-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wallet, ArrowUpRight, Calendar as CalendarIcon, Briefcase, Repeat, Landmark } from "lucide-react";
-import { format } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
-import { filterTransactionsForMonth } from "@/lib/utils";
+import { filterTransactionsForMonth, formatDate } from "@/lib/utils";
 
 export default async function IncomesPage({
   searchParams,
@@ -119,7 +118,7 @@ export default async function IncomesPage({
                       )}
                       <span className="text-xs text-zinc-400 flex items-center">
                         <CalendarIcon className="h-3 w-3 mr-1" />
-                        {format(new Date(income.date), "MMM d, yyyy")}
+                        {formatDate(income.date)}
                       </span>
                     </div>
                   </div>
@@ -185,7 +184,7 @@ export default async function IncomesPage({
                       <td className="px-6 py-4 text-zinc-500">
                         <div className="flex items-center">
                           <CalendarIcon className="h-3 w-3 mr-2" />
-                          {format(new Date(income.date), "MMM d, yyyy")}
+                          {formatDate(income.date)}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right font-medium text-emerald-600 dark:text-emerald-500">

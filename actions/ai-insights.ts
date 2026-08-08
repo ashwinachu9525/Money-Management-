@@ -5,9 +5,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || "",
-});
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_GENAI_API_KEY || "";
+const ai = new GoogleGenAI(apiKey ? { apiKey } : {});
 
 export async function generateFinancialInsights() {
   const session = await getServerSession(authOptions);
@@ -47,29 +46,44 @@ export async function generateFinancialInsights() {
 
   const prompt = `
     Analyze the following anonymized financial data and provide 3 personalized insights.
-    Format your response in simple markdown (no headings, just bullet points) focusing on:
-    1. Spending habits
+    Format your response in clean markdown (bullet points) focusing on:
+    1. Spending habits and category breakdown
     2. Saving opportunities or budget recommendations
-    3. Goal achievement suggestions
+    3. Goal achievement & EMI payment suggestions
 
-    Data:
-    Monthly Income: ₹${totalIncome}
-    Monthly Expense: ₹${totalExpense}
-    Savings: ₹${savings}
-    Regular EMI: ₹${totalRegularEMI}
-    Pre-EMI (Construction Loans): ₹${totalPreEmiPayments}
-    Total Liabilities Payment: ₹${totalEMI}
-    Category Spending: ${JSON.stringify(categorySpending)}
-    Number of Goals: ${goals.length}
+    Financial Context:
+    - Monthly Income: ₹${totalIncome}
+    - Variable Expenses: ₹${totalExpense}
+    - Regular EMI: ₹${totalRegularEMI}
+    - Pre-EMI (Construction Loans): ₹${totalPreEmiPayments}
+    - Total Liabilities Outflow: ₹${totalEMI}
+    - Calculated Net Savings: ₹${savings}
+    - Category Spending: ${JSON.stringify(categorySpending)}
+    - Active Goals Count: ${goals.length}
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+    let aiResponse = "";
 
-    const aiResponse = response.text || "Unable to generate insights at the moment.";
+    try {
+      // Primary: Google Gen AI SDK Interactions API (gemini-3.6-flash)
+      const interaction = await (ai as any).interactions.create({
+        model: "gemini-3.6-flash",
+        input: prompt,
+      });
+      aiResponse = interaction.output_text || interaction.text || "";
+    } catch (primaryErr) {
+      // Fallback: Google Gen AI Models API (gemini-2.5-flash)
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+      });
+      aiResponse = response.text || "";
+    }
+
+    if (!aiResponse) {
+      aiResponse = "Unable to generate insights at the moment. Please verify your financial entries and try again.";
+    }
 
     // Save insight to DB
     await prisma.aIInsight.create({
@@ -83,7 +97,7 @@ export async function generateFinancialInsights() {
     return { insights: aiResponse };
   } catch (error) {
     console.error("AI Generation Error:", error);
-    throw new Error("Failed to generate AI insights.");
+    throw new Error("Failed to generate AI insights. Make sure GEMINI_API_KEY is set in .env.");
   }
 }
 

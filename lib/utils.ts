@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { format as formatFn } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -9,6 +10,17 @@ export function formatIndianCurrency(amount: number | string): string {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) return "₹0";
   return `₹${num.toLocaleString("en-IN")}`;
+}
+
+export function formatDate(date: string | Date | null | undefined, formatStr: string = "MMM d, yyyy"): string {
+  if (!date) return "";
+  try {
+    const d = typeof date === "string" ? new Date(date) : date;
+    if (isNaN(d.getTime())) return "";
+    return formatFn(d, formatStr);
+  } catch (e) {
+    return "";
+  }
 }
 
 export function filterTransactionsForMonth<T extends { date: string | Date; isRecurring?: boolean }>(

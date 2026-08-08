@@ -3,7 +3,6 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { MonthlyReportView } from "@/components/dashboard/monthly-report-view";
-
 import { filterTransactionsForMonth } from "@/lib/utils";
 
 export default async function ReportsPage({
@@ -97,13 +96,13 @@ export default async function ReportsPage({
     },
   });
 
-  // Consolidate into a single serialized array
+  // Consolidate into a single serialized array safely
   const transactions = [
     ...incomes.map(i => ({
       id: i.id,
       name: i.sourceName,
       amount: i.amount,
-      date: i.date.toISOString(),
+      date: typeof i.date === "string" ? i.date : new Date(i.date).toISOString(),
       type: "income" as const,
       category: i.category,
     })),
@@ -111,7 +110,7 @@ export default async function ReportsPage({
       id: e.id,
       name: e.notes || e.category,
       amount: e.amount,
-      date: e.date.toISOString(),
+      date: typeof e.date === "string" ? e.date : new Date(e.date).toISOString(),
       type: "expense" as const,
       category: e.category,
     })),
@@ -119,7 +118,7 @@ export default async function ReportsPage({
       id: b.id,
       name: b.name,
       amount: b.amount,
-      date: b.dueDate.toISOString(),
+      date: b.dueDate ? (typeof b.dueDate === "string" ? b.dueDate : new Date(b.dueDate).toISOString()) : startDate.toISOString(),
       type: "bill" as const,
     })),
     ...emis.map(emi => {
@@ -134,7 +133,7 @@ export default async function ReportsPage({
         id: emi.id,
         name: emi.isPreEmi ? `${emi.name} (Pre-EMI)` : emi.name,
         amount: Math.round(amount),
-        date: startDate.toISOString(), // Represented in the current month
+        date: startDate.toISOString(),
         type: "emi" as const,
       };
     }),
@@ -142,8 +141,8 @@ export default async function ReportsPage({
       id: stmt.id,
       name: `${stmt.creditCard.bank} - ${stmt.creditCard.name} Statement`,
       amount: stmt.statementAmount,
-      date: new Date(stmt.year, stmt.month - 1, stmt.creditCard.dueDate).toISOString(),
-      type: "bill" as const, // Treat as bill for the report
+      date: new Date(stmt.year, stmt.month - 1, stmt.creditCard.dueDate || 1).toISOString(),
+      type: "bill" as const,
     })),
   ];
 

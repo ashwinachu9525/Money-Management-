@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { format, subMonths, addMonths } from "date-fns";
+import { subMonths, addMonths } from "date-fns";
+import { formatDate } from "@/lib/utils";
 import { ChevronLeft, ChevronRight, Printer, Wallet, Receipt, CreditCard, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -88,7 +89,7 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <h2 className="text-xl font-bold min-w-[150px] text-center">
-            {format(date, "MMMM yyyy")}
+            {formatDate(date, "MMMM yyyy")}
           </h2>
           <Button variant="outline" size="icon" onClick={handleNextMonth} disabled={date.getMonth() === new Date().getMonth() && date.getFullYear() === new Date().getFullYear()}>
             <ChevronRight className="h-4 w-4" />
@@ -106,7 +107,7 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
       {/* Print Header - Only visible when printing */}
       <div className="hidden print:block text-center mb-8">
         <h1 className="text-3xl font-bold">Monthly Financial Report</h1>
-        <p className="text-xl text-gray-500">{format(date, "MMMM yyyy")}</p>
+        <p className="text-xl text-gray-500">{formatDate(date, "MMMM yyyy")}</p>
       </div>
 
       {/* Summary Cards */}
