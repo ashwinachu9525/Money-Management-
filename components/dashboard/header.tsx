@@ -15,6 +15,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { NotificationPopover } from "@/components/dashboard/notification-popover";
+import { ThemeToggle } from "@/components/dashboard/theme-toggle";
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { data: session } = useSession();
@@ -43,11 +46,9 @@ export function Header() {
 
       {/* Full Mobile Slide-out Menu */}
       <FullMobileMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen} />
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="relative" title="Notifications">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-600"></span>
-        </Button>
+      <div className="flex items-center gap-2 sm:gap-3">
+        <ThemeToggle />
+        <NotificationPopover />
 
         <DropdownMenu>
           <DropdownMenuTrigger

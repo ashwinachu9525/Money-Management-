@@ -71,12 +71,15 @@ export default async function ReportsPage({
     },
   });
 
-  // EMIs that are active during this month
+  // EMIs & Pre-EMIs active during this month
   const emis = await prisma.eMI.findMany({
     where: {
       userId: session.user.id,
       startDate: { lte: endDate },
       endDate: { gte: startDate },
+    },
+    include: {
+      slabs: true,
     },
   });
 
@@ -119,13 +122,22 @@ export default async function ReportsPage({
       date: b.dueDate.toISOString(),
       type: "bill" as const,
     })),
-    ...emis.map(emi => ({
-      id: emi.id,
-      name: emi.name,
-      amount: emi.emiAmount,
-      date: startDate.toISOString(), // Represented in the current month
-      type: "emi" as const,
-    })),
+    ...emis.map(emi => {
+      let amount = emi.emiAmount;
+      if (emi.isPreEmi && emi.slabs) {
+        const totalDisbursed = emi.slabs
+          .filter((s: any) => s.status === "DISBURSED")
+          .reduce((sum: number, s: any) => sum + s.amount, 0);
+        amount = (totalDisbursed * (emi.interestRate / 100)) / 12;
+      }
+      return {
+        id: emi.id,
+        name: emi.isPreEmi ? `${emi.name} (Pre-EMI)` : emi.name,
+        amount: Math.round(amount),
+        date: startDate.toISOString(), // Represented in the current month
+        type: "emi" as const,
+      };
+    }),
     ...creditCardStatements.map(stmt => ({
       id: stmt.id,
       name: `${stmt.creditCard.bank} - ${stmt.creditCard.name} Statement`,

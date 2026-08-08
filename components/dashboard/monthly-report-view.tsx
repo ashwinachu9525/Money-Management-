@@ -22,6 +22,8 @@ interface MonthlyReportViewProps {
   currentMonthDate: string; // ISO string of the first day of the selected month
 }
 
+import { EmailReportButton } from "./email-report-btn";
+
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
 export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyReportViewProps) {
@@ -92,10 +94,13 @@ export function MonthlyReportView({ transactions, currentMonthDate }: MonthlyRep
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <Button onClick={handlePrint} variant="secondary" className="gap-2">
-          <Printer className="h-4 w-4" />
-          Print Report
-        </Button>
+        <div className="flex items-center gap-2">
+          <EmailReportButton month={date.getMonth()} year={date.getFullYear()} />
+          <Button onClick={handlePrint} variant="secondary" className="gap-2">
+            <Printer className="h-4 w-4" />
+            Print Report
+          </Button>
+        </div>
       </div>
 
       {/* Print Header - Only visible when printing */}

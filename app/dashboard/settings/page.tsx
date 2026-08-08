@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { InstallPWAButton } from "@/components/dashboard/install-pwa-btn";
+import { TestNotificationCard } from "@/components/dashboard/test-notification-card";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -64,6 +65,8 @@ export default async function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <TestNotificationCard />
 
         <Card className="md:col-span-2 border-blue-200 dark:border-blue-900 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
           <CardHeader>
