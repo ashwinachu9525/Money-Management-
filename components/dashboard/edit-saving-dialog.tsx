@@ -36,6 +36,7 @@ import {
 import { updateSaving } from "@/actions/savings";
 
 const SAVINGS_CATEGORIES = [
+  "EPF / Employee Provident Fund",
   "LIC / Life Insurance",
   "Kotak Future Secure / Savings Plan",
   "Mutual Funds / SIP",

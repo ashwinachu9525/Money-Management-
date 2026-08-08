@@ -90,7 +90,7 @@ export default async function SavingsPage() {
             Savings & Investments
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage your LIC policies, Kotak Future Secure, Stocks, Mutual Funds, FDs, and long-term savings.
+            Manage your EPF, LIC policies, Kotak Future Secure, Stocks, Mutual Funds, FDs, and long-term savings.
           </p>
         </div>
         <AddSavingDialog />
