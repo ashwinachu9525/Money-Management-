@@ -15,6 +15,8 @@ import { ExportButton } from "@/components/dashboard/export-btn";
 import { format, subMonths } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
+import { filterTransactionsForMonth } from "@/lib/utils";
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -48,13 +50,11 @@ export default async function DashboardPage({
   const filterMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month) : currentMonth;
   const filterYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year) : currentYear;
 
-  const thisMonthIncome = incomes
-    .filter((i: any) => isAllTime || (new Date(i.date).getMonth() === filterMonth && new Date(i.date).getFullYear() === filterYear))
-    .reduce((sum: number, i: any) => sum + i.amount, 0);
-    
-  const thisMonthExpense = expenses
-    .filter((e: any) => isAllTime || (new Date(e.date).getMonth() === filterMonth && new Date(e.date).getFullYear() === filterYear))
-    .reduce((sum: number, e: any) => sum + e.amount, 0);
+  const filteredIncomes = filterTransactionsForMonth(incomes, filterMonth, filterYear, isAllTime);
+  const filteredExpenses = filterTransactionsForMonth(expenses, filterMonth, filterYear, isAllTime);
+
+  const thisMonthIncome = filteredIncomes.reduce((sum: number, i: any) => sum + i.amount, 0);
+  const thisMonthExpense = filteredExpenses.reduce((sum: number, e: any) => sum + e.amount, 0);
 
   const remainingBalance = thisMonthIncome - thisMonthExpense; // Cashflow for the month
 
@@ -65,8 +65,11 @@ export default async function DashboardPage({
     const m = d.getMonth();
     const y = d.getFullYear();
     
-    const inc = incomes.filter((inc: any) => new Date(inc.date).getMonth() === m && new Date(inc.date).getFullYear() === y).reduce((s: number, x: any) => s + x.amount, 0);
-    const exp = expenses.filter((exp: any) => new Date(exp.date).getMonth() === m && new Date(exp.date).getFullYear() === y).reduce((s: number, x: any) => s + x.amount, 0);
+    const monthIncomes = filterTransactionsForMonth(incomes, m, y, false);
+    const monthExpenses = filterTransactionsForMonth(expenses, m, y, false);
+    
+    const inc = monthIncomes.reduce((s: number, x: any) => s + x.amount, 0);
+    const exp = monthExpenses.reduce((s: number, x: any) => s + x.amount, 0);
     
     chartData.push({
       name: format(d, "MMM"),
@@ -74,10 +77,6 @@ export default async function DashboardPage({
       Expense: exp,
     });
   }
-
-  // Prepare recent transactions
-  const filteredIncomes = isAllTime ? incomes : incomes.filter((i: any) => new Date(i.date).getMonth() === filterMonth && new Date(i.date).getFullYear() === filterYear);
-  const filteredExpenses = isAllTime ? expenses : expenses.filter((e: any) => new Date(e.date).getMonth() === filterMonth && new Date(e.date).getFullYear() === filterYear);
 
   const allTransactions = [
     ...filteredIncomes.map((i: any) => ({
@@ -113,7 +112,7 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-none shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium opacity-90">Total Available Balance</CardTitle>

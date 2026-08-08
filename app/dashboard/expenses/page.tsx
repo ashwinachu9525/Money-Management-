@@ -9,6 +9,8 @@ import { format } from "date-fns";
 
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
+import { filterTransactionsForMonth } from "@/lib/utils";
+
 export default async function ExpensesPage({
   searchParams,
 }: {
@@ -26,13 +28,8 @@ export default async function ExpensesPage({
   const filterMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month) : currentMonth;
   const filterYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year) : currentYear;
 
-  // Apply filter
-  const filteredExpenses = isAllTime 
-    ? expenses 
-    : expenses.filter(exp => {
-        const d = new Date(exp.date);
-        return d.getMonth() === filterMonth && d.getFullYear() === filterYear;
-      });
+  // Apply filter with recurring carry forward
+  const filteredExpenses = filterTransactionsForMonth(expenses, filterMonth, filterYear, isAllTime);
 
   const totalExpense = filteredExpenses.reduce((sum, exp) => sum + exp.amount, 0);
 

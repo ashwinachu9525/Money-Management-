@@ -82,12 +82,12 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button variant="outline" size="sm" className="mt-4">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Disbursement Slab
-          </Button>
+          <Button variant="outline" size="sm" className="mt-4" />
         }
-      />
+      >
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add Disbursement Slab
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add Disbursement Slab</DialogTitle>

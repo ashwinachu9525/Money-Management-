@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Landmark, Calendar, IndianRupee, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
+import { CreditCard, Landmark, Calendar, Trash2, CheckCircle2, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StatementDialog } from "./statement-dialog";
+import { EditCreditCardDialog } from "./edit-credit-card-dialog";
 import { deleteCreditCard } from "@/actions/credit-cards";
 import { toast } from "sonner";
 import {
@@ -48,7 +49,7 @@ export function CreditCardList({ cards }: CreditCardListProps) {
 
   if (cards.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
+      <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed rounded-xl bg-zinc-50 dark:bg-zinc-900/50">
         <CreditCard className="h-12 w-12 text-zinc-300 dark:text-zinc-700 mb-4" />
         <h3 className="text-lg font-medium">No credit cards found</h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
@@ -63,7 +64,7 @@ export function CreditCardList({ cards }: CreditCardListProps) {
       {cards.map((card) => {
         // Find latest statement
         const latestStatement = card.statements.length > 0 
-          ? card.statements.sort((a: any, b: any) => {
+          ? [...card.statements].sort((a: any, b: any) => {
               if (a.year !== b.year) return b.year - a.year;
               return b.month - a.month;
             })[0]
@@ -82,9 +83,12 @@ export function CreditCardList({ cards }: CreditCardListProps) {
                   </CardTitle>
                   <CardDescription className="mt-1 font-medium">{card.name}</CardDescription>
                 </div>
-                <Badge variant="outline" className="font-mono bg-white dark:bg-zinc-800">
-                  •••• {card.last4Digits}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="font-mono bg-white dark:bg-zinc-800">
+                    •••• {card.last4Digits}
+                  </Badge>
+                  <EditCreditCardDialog card={card} />
+                </div>
               </div>
             </CardHeader>
             <CardContent className="flex-1 pt-4 space-y-6">
@@ -105,7 +109,7 @@ export function CreditCardList({ cards }: CreditCardListProps) {
                   {currentUtilization > 30 && (
                     <span className="text-xs text-amber-500 flex items-center">
                       <AlertCircle className="h-3 w-3 mr-1" />
-                      Keep under 30% for optimal score
+                      Keep under 30%
                     </span>
                   )}
                 </div>
@@ -130,12 +134,15 @@ export function CreditCardList({ cards }: CreditCardListProps) {
 
               {latestStatement && (
                 <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 mt-4">
-                  <h4 className="text-sm font-semibold mb-3 flex items-center">
-                    Latest Statement 
-                    <span className="text-xs font-normal text-muted-foreground ml-2">
-                      ({format(new Date(latestStatement.year, latestStatement.month - 1), 'MMM yyyy')})
-                    </span>
-                  </h4>
+                  <div className="flex justify-between items-center mb-3">
+                    <h4 className="text-sm font-semibold flex items-center">
+                      Latest Statement 
+                      <span className="text-xs font-normal text-muted-foreground ml-2">
+                        ({format(new Date(latestStatement.year, latestStatement.month - 1), 'MMM yyyy')})
+                      </span>
+                    </h4>
+                    <StatementDialog creditCardId={card.id} statement={latestStatement} />
+                  </div>
                   
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
@@ -166,34 +173,41 @@ export function CreditCardList({ cards }: CreditCardListProps) {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="border-t border-zinc-100 dark:border-zinc-800 p-4 bg-zinc-50/50 dark:bg-zinc-900/20 flex justify-between">
+            <CardFooter className="border-t border-zinc-100 dark:border-zinc-800 p-4 bg-zinc-50/50 dark:bg-zinc-900/20 flex justify-between items-center">
               <StatementDialog creditCardId={card.id} />
               
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950">
+              <div className="flex items-center gap-1">
+                <EditCreditCardDialog card={card} />
+                
+                <AlertDialog>
+                  <AlertDialogTrigger
+                    render={
+                      <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/50" title="Delete Card" />
+                    }
+                  >
                     <Trash2 className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This will permanently delete the credit card and all its statements.
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction 
-                      onClick={() => handleDelete(card.id)}
-                      className="bg-red-500 hover:bg-red-600"
-                    >
-                      Delete
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    <span className="sr-only">Delete Card</span>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete the credit card and all its statements.
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={() => handleDelete(card.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             </CardFooter>
           </Card>
         );

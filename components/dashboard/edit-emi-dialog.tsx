@@ -101,12 +101,12 @@ export function EditEmiDialog({ emi }: { emi: any }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 h-8 w-8" title="Edit">
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Edit Loan</span>
-          </Button>
+          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 h-8 w-8" title="Edit" />
         }
-      />
+      >
+        <Pencil className="h-4 w-4" />
+        <span className="sr-only">Edit Loan</span>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Loan Details</DialogTitle>

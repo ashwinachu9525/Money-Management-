@@ -38,7 +38,7 @@ export function OverviewChart({ data }: OverviewChartProps) {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `₹${value}`}
+          tickFormatter={(value) => `₹${Number(value).toLocaleString("en-IN")}`}
         />
         {/* Tooltip and Legend temporarily removed to prevent React 19 / Recharts hydration crash */}
         <Bar dataKey="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={50} />

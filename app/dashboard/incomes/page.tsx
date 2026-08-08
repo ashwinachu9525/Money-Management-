@@ -8,6 +8,8 @@ import { Wallet, ArrowUpRight, Calendar as CalendarIcon, Briefcase, Repeat, Land
 import { format } from "date-fns";
 import { MonthYearFilter } from "@/components/dashboard/month-year-filter";
 
+import { filterTransactionsForMonth } from "@/lib/utils";
+
 export default async function IncomesPage({
   searchParams,
 }: {
@@ -25,12 +27,7 @@ export default async function IncomesPage({
   const filterMonth = resolvedSearchParams.month ? parseInt(resolvedSearchParams.month) : currentMonth;
   const filterYear = resolvedSearchParams.year ? parseInt(resolvedSearchParams.year) : currentYear;
 
-  const filteredIncomes = isAllTime 
-    ? incomes 
-    : incomes.filter(inc => {
-        const d = new Date(inc.date);
-        return d.getMonth() === filterMonth && d.getFullYear() === filterYear;
-      });
+  const filteredIncomes = filterTransactionsForMonth(incomes, filterMonth, filterYear, isAllTime);
 
   const totalIncome = filteredIncomes.reduce((sum, inc) => sum + inc.amount, 0);
 

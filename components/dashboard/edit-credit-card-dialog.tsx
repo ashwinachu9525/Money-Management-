@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Loader2 } from "lucide-react";
+import { Pencil, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { useSession } from "next-auth/react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { addCreditCard } from "@/actions/credit-cards";
+import { updateCreditCard } from "@/actions/credit-cards";
 
 const creditCardSchema = z.object({
   bank: z.string().min(2, "Bank name is required"),
@@ -39,42 +38,32 @@ const creditCardSchema = z.object({
 
 type CreditCardFormValues = z.infer<typeof creditCardSchema>;
 
-export function AddCreditCardDialog() {
+export function EditCreditCardDialog({ card }: { card: any }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: session } = useSession();
 
   const form = useForm<CreditCardFormValues>({
     resolver: zodResolver(creditCardSchema),
     defaultValues: {
-      bank: "",
-      name: "",
-      last4Digits: "",
-      creditLimit: 0,
-      billingCycleDate: 1,
-      dueDate: 15,
+      bank: card.bank,
+      name: card.name,
+      last4Digits: card.last4Digits,
+      creditLimit: card.creditLimit,
+      billingCycleDate: card.billingCycleDate,
+      dueDate: card.dueDate,
     },
   });
 
   async function onSubmit(data: CreditCardFormValues) {
-    if (!session?.user?.id) {
-      toast.error("You must be logged in");
-      return;
-    }
-
     setIsLoading(true);
     try {
-      const result = await addCreditCard({
-        ...data,
-        userId: session.user.id,
-      });
+      const result = await updateCreditCard(card.id, data);
 
       if (result.success) {
-        toast.success("Credit card added successfully");
+        toast.success("Credit card updated successfully");
         setOpen(false);
-        form.reset();
       } else {
-        toast.error(result.error || "Failed to add credit card");
+        toast.error(result.error || "Failed to update credit card");
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
@@ -85,15 +74,24 @@ export function AddCreditCardDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="bg-blue-600 hover:bg-blue-700" />}>
-        <PlusCircle className="mr-2 h-4 w-4" />
-        Add Card
+      <DialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50"
+            title="Edit Card"
+          />
+        }
+      >
+        <Pencil className="h-4 w-4" />
+        <span className="sr-only">Edit Card</span>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Credit Card</DialogTitle>
+          <DialogTitle>Edit Credit Card</DialogTitle>
           <DialogDescription>
-            Enter your credit card details to start tracking.
+            Update your credit card details.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -181,7 +179,7 @@ export function AddCreditCardDialog() {
             <div className="flex justify-end pt-4">
               <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Add Card
+                Save Changes
               </Button>
             </div>
           </form>

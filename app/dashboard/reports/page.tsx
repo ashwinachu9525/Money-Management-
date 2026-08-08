@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { MonthlyReportView } from "@/components/dashboard/monthly-report-view";
 
+import { filterTransactionsForMonth } from "@/lib/utils";
+
 export default async function ReportsPage({
   searchParams,
 }: {
@@ -24,26 +26,40 @@ export default async function ReportsPage({
   const startDate = new Date(year, month, 1);
   const endDate = new Date(year, month + 1, 0, 23, 59, 59, 999);
 
-  // Fetch data
-  const incomes = await prisma.income.findMany({
+  // Fetch data - including recurring entries created on or before this month
+  const rawIncomes = await prisma.income.findMany({
     where: {
       userId: session.user.id,
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
+      OR: [
+        { date: { gte: startDate, lte: endDate } },
+        { isRecurring: true, date: { lte: endDate } }
+      ]
     },
   });
 
-  const expenses = await prisma.expense.findMany({
+  const rawExpenses = await prisma.expense.findMany({
     where: {
       userId: session.user.id,
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
+      OR: [
+        { date: { gte: startDate, lte: endDate } },
+        { isRecurring: true, date: { lte: endDate } }
+      ]
     },
   });
+
+  const incomes = filterTransactionsForMonth(
+    JSON.parse(JSON.stringify(rawIncomes)),
+    month,
+    year,
+    false
+  );
+
+  const expenses = filterTransactionsForMonth(
+    JSON.parse(JSON.stringify(rawExpenses)),
+    month,
+    year,
+    false
+  );
 
   const bills = await prisma.bill.findMany({
     where: {

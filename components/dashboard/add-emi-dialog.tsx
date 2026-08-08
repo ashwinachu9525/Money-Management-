@@ -104,12 +104,12 @@ export function AddEMIDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Loan
-          </Button>
+          <Button />
         }
-      />
+      >
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add Loan
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Loan</DialogTitle>

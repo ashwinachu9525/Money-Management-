@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { InstallPWAButton } from "@/components/dashboard/install-pwa-btn";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -61,6 +62,20 @@ export default async function SettingsPage() {
               <Input value="INR (₹)" disabled />
               <p className="text-xs text-muted-foreground">Currently locked to Indian Rupee</p>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2 border-blue-200 dark:border-blue-900 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/20">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-700 dark:text-blue-400">
+              Mobile & Desktop App (PWA)
+            </CardTitle>
+            <CardDescription>
+              Install Money Manager directly on your phone home screen or desktop for full-screen offline experience.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <InstallPWAButton />
           </CardContent>
         </Card>
       </div>

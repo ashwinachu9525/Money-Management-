@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { addStatement, updateStatement } from "@/actions/credit-cards";
+import { formatIndianCurrency } from "@/lib/utils";
 
 const statementSchema = z.object({
   month: z.coerce.number().min(1).max(12),
@@ -75,6 +76,7 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
   const status = form.watch("status");
   const statementAmount = form.watch("statementAmount");
   const minimumDue = form.watch("minimumDue");
+  const paidAmount = form.watch("paidAmount");
 
   useEffect(() => {
     if (status === "PAID_FULL") {
@@ -115,12 +117,21 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" size="sm">
+      <DialogTrigger
+        render={
+          (trigger as React.ReactElement) || (
+            <Button variant="outline" size="sm">
+              {isEditing ? <Edit className="h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
+              {isEditing ? "" : "Add Statement"}
+            </Button>
+          )
+        }
+      >
+        {!trigger && (
+          <>
             {isEditing ? <Edit className="h-4 w-4" /> : <Plus className="mr-2 h-4 w-4" />}
             {isEditing ? "" : "Add Statement"}
-          </Button>
+          </>
         )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
@@ -170,6 +181,11 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
+                    {Number(field.value) > 0 && (
+                      <p className="text-[11px] text-blue-600 dark:text-blue-400 font-medium mt-0.5">
+                        {formatIndianCurrency(field.value)}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -183,6 +199,11 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
                     <FormControl>
                       <Input type="number" {...field} />
                     </FormControl>
+                    {Number(field.value) > 0 && (
+                      <p className="text-[11px] text-blue-600 dark:text-blue-400 font-medium mt-0.5">
+                        {formatIndianCurrency(field.value)}
+                      </p>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -219,6 +240,11 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
                   <FormControl>
                     <Input type="number" {...field} />
                   </FormControl>
+                  {Number(field.value) > 0 && (
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">
+                      {formatIndianCurrency(field.value)}
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
