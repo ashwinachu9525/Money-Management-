@@ -6,10 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatIndianCurrency(amount: number | string): string {
+export function formatIndianCurrency(amount: number | string, options?: { maximumFractionDigits?: number }): string {
   const num = typeof amount === "string" ? parseFloat(amount) : amount;
   if (isNaN(num)) return "₹0";
-  return `₹${num.toLocaleString("en-IN")}`;
+  const maxDigits = options?.maximumFractionDigits ?? (Number.isInteger(num) ? 0 : 2);
+  return `₹${num.toLocaleString("en-IN", { maximumFractionDigits: maxDigits })}`;
 }
 
 export function formatDate(date: string | Date | null | undefined, formatStr: string = "MMM d, yyyy"): string {

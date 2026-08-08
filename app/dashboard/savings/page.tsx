@@ -54,25 +54,26 @@ export default async function SavingsPage() {
     return sum + inv;
   }, 0);
 
+  // Monthly policy commitment: Sum ONLY active policies with frequency === "MONTHLY"
   const monthlyCommitment = savings.reduce((sum, s) => {
     const amt = s.contributionAmount || 0;
-    
-    // Exclude EPF / Employee Provident Fund from monthly out-of-pocket commitments
-    const isEPF = s.category?.toLowerCase().includes("epf") || s.category?.toLowerCase().includes("provident fund");
-    if (isEPF || amt <= 0 || s.frequency === "ONE_TIME") return sum;
-
-    switch (s.frequency) {
-      case "MONTHLY":
-        return sum + amt;
-      case "QUARTERLY":
-        return sum + amt / 3;
-      case "HALF_YEARLY":
-        return sum + amt / 6;
-      case "YEARLY":
-        return sum + amt / 12;
-      default:
-        return sum;
+    if (s.frequency === "MONTHLY" && amt > 0) {
+      return sum + amt;
     }
+    return sum;
+  }, 0);
+
+  const monthlyCount = savings.filter(
+    (s) => s.frequency === "MONTHLY" && (s.contributionAmount || 0) > 0
+  ).length;
+
+  // Annual policy premiums: Sum policies with frequency === "YEARLY"
+  const yearlyCommitment = savings.reduce((sum, s) => {
+    const amt = s.contributionAmount || 0;
+    if (s.frequency === "YEARLY" && amt > 0) {
+      return sum + amt;
+    }
+    return sum;
   }, 0);
 
   // Only calculate gain/loss for items with explicit separate investment and current values
@@ -146,10 +147,10 @@ export default async function SavingsPage() {
           </CardContent>
         </Card>
 
-        {/* Card 3: Monthly Commitment */}
+        {/* Card 3: Monthly Policy Commitment */}
         <Card className="shadow-sm border-zinc-200 dark:border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Monthly Savings Commitment</CardTitle>
+            <CardTitle className="text-sm font-medium">Monthly Policy Commitment</CardTitle>
             <Clock className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
@@ -157,7 +158,8 @@ export default async function SavingsPage() {
               {formatIndianCurrency(monthlyCommitment)}<span className="text-xs font-normal text-muted-foreground">/mo</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Annual: {formatIndianCurrency(monthlyCommitment * 12)}
+              Across {monthlyCount} monthly {monthlyCount === 1 ? "policy" : "policies"}
+              {yearlyCommitment > 0 && ` • Annual Premiums: ${formatIndianCurrency(yearlyCommitment)}/yr`}
             </p>
           </CardContent>
         </Card>
