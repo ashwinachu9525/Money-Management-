@@ -58,6 +58,11 @@ const routes = [
     href: "/dashboard/goals",
   },
   {
+    label: "Savings & Policies",
+    icon: PiggyBank,
+    href: "/dashboard/savings",
+  },
+  {
     label: "AI Insights",
     icon: Sparkles,
     href: "/dashboard/insights",

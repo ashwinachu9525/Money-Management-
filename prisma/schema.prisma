@@ -23,6 +23,7 @@ model User {
   aiInsights    AIInsight[]
   notifications Notification[]
   creditCards   CreditCard[]
+  savings       Saving[]
 }
 
 model Income {
@@ -184,4 +185,23 @@ model CreditCardStatement {
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
   creditCard      CreditCard @relation(fields: [creditCardId], references: [id], onDelete: Cascade)
+}
+
+model Saving {
+  id                 String    @id @default(cuid())
+  userId             String
+  name               String    // e.g., "LIC Jeevan Anand", "Kotak Future Secure", "SBI Bluechip MF", "Kotak Stocks", "Fixed Deposit"
+  category           String    // e.g., "LIC / Insurance Policy", "Mutual Funds", "Stocks / Equity", "Fixed Deposit / RD", "PPF / NPS", "Government Scheme", "Other Savings"
+  institution        String?   // e.g., "LIC India", "Kotak Life Insurance", "Zerodha", "HDFC Bank"
+  policyNumber       String?   // Policy Number / Account Number / Folio Number (Optional)
+  frequency          String    @default("MONTHLY") // "MONTHLY", "QUARTERLY", "HALF_YEARLY", "YEARLY", "ONE_TIME"
+  contributionAmount Float     // Contribution amount per frequency (e.g. ₹5,000/month or ₹50,000/year)
+  totalInvestment    Float     // Total accumulated investment / total amount paid to date
+  currentValue       Float?    // Optional current valuation / return value
+  startDate          DateTime  // Investment / Policy start date
+  maturityDate       DateTime? // Optional maturity date / policy end date
+  notes              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

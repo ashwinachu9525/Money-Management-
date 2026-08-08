@@ -22,10 +22,11 @@ import { deleteBill } from "@/actions/bills";
 import { deleteGoal } from "@/actions/goals";
 import { deleteBankAccount } from "@/actions/bank-accounts";
 import { deleteEMI } from "@/actions/emis";
+import { deleteSaving } from "@/actions/savings";
 
 interface DeleteButtonProps {
   id?: string;
-  itemType?: "Income" | "Expense" | "Bill" | "Goal" | "Account" | "EMI" | "Pre-EMI Loan" | string;
+  itemType?: "Income" | "Expense" | "Bill" | "Goal" | "Account" | "EMI" | "Pre-EMI Loan" | "Saving" | "Investment" | string;
 }
 
 export function DeleteButton({ id, itemType = "Item" }: DeleteButtonProps) {
@@ -42,6 +43,7 @@ export function DeleteButton({ id, itemType = "Item" }: DeleteButtonProps) {
         else if (itemType === "Goal") await deleteGoal(id);
         else if (itemType === "Account") await deleteBankAccount(id);
         else if (itemType === "EMI" || itemType === "Pre-EMI Loan") await deleteEMI(id);
+        else if (itemType === "Saving" || itemType === "Investment") await deleteSaving(id);
         
         toast.success(`${itemType} deleted successfully`);
         setOpen(false);

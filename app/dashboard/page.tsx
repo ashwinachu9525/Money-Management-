@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { IndianRupee, ArrowUpCircle, ArrowDownCircle, Wallet } from "lucide-react";
+import { IndianRupee, ArrowUpCircle, ArrowDownCircle, Wallet, PiggyBank } from "lucide-react";
 import { OverviewChart } from "@/components/dashboard/overview-chart";
 import { RecentTransactions } from "@/components/dashboard/recent-transactions";
 import { ExportButton } from "@/components/dashboard/export-btn";
@@ -39,9 +39,13 @@ export default async function DashboardPage({
   const expenses = JSON.parse(JSON.stringify(
     await prisma.expense.findMany({ where: { userId: session.user.id }, orderBy: { date: "desc" } })
   )) as any[];
+  const savings = JSON.parse(JSON.stringify(
+    await prisma.saving.findMany({ where: { userId: session.user.id } })
+  )) as any[];
 
   // Calculate totals
   const totalBalance = accounts.reduce((sum: number, acc: any) => sum + acc.balance, 0);
+  const totalSavingsPortfolio = savings.reduce((sum: number, s: any) => sum + (s.currentValue ?? s.totalInvestment ?? 0), 0);
   
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -112,15 +116,26 @@ export default async function DashboardPage({
         </div>
       </div>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
         <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-none shadow-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium opacity-90">Total Available Balance</CardTitle>
+            <CardTitle className="text-sm font-medium opacity-90">Total Bank Balance</CardTitle>
             <Wallet className="h-4 w-4 opacity-75" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₹{totalBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</div>
             <p className="text-xs opacity-80 mt-1">Across {accounts.length} accounts</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-emerald-600 to-teal-700 text-white border-none shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium opacity-90">Savings & Investments</CardTitle>
+            <PiggyBank className="h-4 w-4 opacity-75" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">₹{totalSavingsPortfolio.toLocaleString("en-IN")}</div>
+            <p className="text-xs opacity-80 mt-1">{savings.length} policies / investment plans</p>
           </CardContent>
         </Card>
 
@@ -154,7 +169,7 @@ export default async function DashboardPage({
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-zinc-200 dark:border-zinc-800">
+        <Card className="shadow-sm border-zinc-200 dark:border-zinc-800 sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">{isAllTime ? "Total Cashflow" : "Period Cashflow"}</CardTitle>
             <IndianRupee className={`h-4 w-4 ${remainingBalance >= 0 ? 'text-emerald-500' : 'text-rose-500'}`} />
