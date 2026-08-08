@@ -43,7 +43,7 @@ export function EditCreditCardDialog({ card }: { card: any }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<CreditCardFormValues>({
-    resolver: zodResolver(creditCardSchema),
+    resolver: zodResolver(creditCardSchema) as any,
     defaultValues: {
       bank: card.bank,
       name: card.name,

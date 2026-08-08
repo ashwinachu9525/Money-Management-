@@ -46,7 +46,7 @@ export function AddBillDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<BillFormValues>({
-    resolver: zodResolver(billSchema),
+    resolver: zodResolver(billSchema) as any,
     defaultValues: {
       name: "",
       amount: 0,
@@ -97,7 +97,7 @@ export function AddBillDialog() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Bill Type / Name</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select bill type" />

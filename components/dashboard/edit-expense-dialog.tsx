@@ -59,7 +59,7 @@ export function EditExpenseDialog({ expense, accounts = [] }: { expense: Seriali
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ExpenseFormValues>({
-    resolver: zodResolver(expenseSchema),
+    resolver: zodResolver(expenseSchema) as any,
     defaultValues: {
       category: expense.category,
       amount: expense.amount,
@@ -155,7 +155,7 @@ export function EditExpenseDialog({ expense, accounts = [] }: { expense: Seriali
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Paid From Bank Account (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select bank account..." />

@@ -42,7 +42,7 @@ export function AddAccountDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountSchema),
+    resolver: zodResolver(accountSchema) as any,
     defaultValues: {
       bankName: "",
       accountNick: "",

@@ -43,7 +43,7 @@ export function AddSlabDialog({ emiId, nextSlabNumber }: { emiId: string; nextSl
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<SlabFormValues>({
-    resolver: zodResolver(slabSchema),
+    resolver: zodResolver(slabSchema) as any,
     defaultValues: {
       slabNumber: nextSlabNumber,
       amount: 0,

@@ -61,7 +61,7 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
   const currentYear = new Date().getFullYear();
 
   const form = useForm<StatementFormValues>({
-    resolver: zodResolver(statementSchema),
+    resolver: zodResolver(statementSchema) as any,
     defaultValues: {
       month: statement?.month || currentMonth,
       year: statement?.year || currentYear,
@@ -209,7 +209,7 @@ export function StatementDialog({ creditCardId, statement, trigger }: StatementD
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />

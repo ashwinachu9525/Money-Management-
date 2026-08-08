@@ -63,7 +63,7 @@ export function EditIncomeDialog({ income, accounts = [] }: { income: Serialized
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<IncomeFormValues>({
-    resolver: zodResolver(incomeSchema),
+    resolver: zodResolver(incomeSchema) as any,
     defaultValues: {
       sourceName: income.sourceName,
       companyName: income.companyName || "",
@@ -187,7 +187,7 @@ export function EditIncomeDialog({ income, accounts = [] }: { income: Serialized
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Deposit to Bank Account (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select bank account..." />

@@ -50,7 +50,7 @@ export function EditBillDialog({ bill }: { bill: SerializedBill }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<BillFormValues>({
-    resolver: zodResolver(billSchema),
+    resolver: zodResolver(billSchema) as any,
     defaultValues: {
       name: bill.name,
       amount: bill.amount,

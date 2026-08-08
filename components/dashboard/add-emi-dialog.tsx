@@ -55,7 +55,7 @@ export function AddEMIDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<EMIFormValues>({
-    resolver: zodResolver(emiSchema),
+    resolver: zodResolver(emiSchema) as any,
     defaultValues: {
       isPreEmi: false,
       name: "",

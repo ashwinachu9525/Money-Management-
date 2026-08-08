@@ -53,7 +53,7 @@ export function EditAccountDialog({ account }: { account: SerializedBankAccount 
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<AccountFormValues>({
-    resolver: zodResolver(accountSchema),
+    resolver: zodResolver(accountSchema) as any,
     defaultValues: {
       bankName: account.bankName,
       accountNick: account.accountNick,

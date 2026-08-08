@@ -44,7 +44,7 @@ export function AddGoalDialog() {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<GoalFormValues>({
-    resolver: zodResolver(goalSchema),
+    resolver: zodResolver(goalSchema) as any,
     defaultValues: {
       name: "",
       targetAmount: 0,
@@ -170,7 +170,7 @@ export function AddGoalDialog() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Priority</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select priority" />

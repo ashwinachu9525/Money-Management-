@@ -45,7 +45,7 @@ export function AddCreditCardDialog() {
   const { data: session } = useSession();
 
   const form = useForm<CreditCardFormValues>({
-    resolver: zodResolver(creditCardSchema),
+    resolver: zodResolver(creditCardSchema) as any,
     defaultValues: {
       bank: "",
       name: "",

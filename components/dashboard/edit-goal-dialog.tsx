@@ -55,7 +55,7 @@ export function EditGoalDialog({ goal }: { goal: SerializedGoal }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<GoalFormValues>({
-    resolver: zodResolver(goalSchema),
+    resolver: zodResolver(goalSchema) as any,
     defaultValues: {
       name: goal.name,
       targetAmount: goal.targetAmount,
@@ -163,7 +163,7 @@ export function EditGoalDialog({ goal }: { goal: SerializedGoal }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Priority</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select priority" />

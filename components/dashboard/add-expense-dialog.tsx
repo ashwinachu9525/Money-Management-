@@ -52,7 +52,7 @@ export function AddExpenseDialog({ accounts = [] }: { accounts?: any[] }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<ExpenseFormValues>({
-    resolver: zodResolver(expenseSchema),
+    resolver: zodResolver(expenseSchema) as any,
     defaultValues: {
       category: "",
       amount: 0,
@@ -105,7 +105,7 @@ export function AddExpenseDialog({ accounts = [] }: { accounts?: any[] }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={isLoading}>
+                  <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
@@ -158,7 +158,7 @@ export function AddExpenseDialog({ accounts = [] }: { accounts?: any[] }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Paid From Bank Account (Optional)</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select bank account..." />
