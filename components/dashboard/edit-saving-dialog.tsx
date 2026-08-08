@@ -96,9 +96,16 @@ export function EditSavingDialog({ saving }: { saving: any }) {
   async function onSubmit(data: SavingFormValues) {
     setIsLoading(true);
     try {
+      const rawTot = Number(data.totalInvestment) || 0;
+      const rawCurr = data.currentValue ? Number(data.currentValue) : 0;
+
+      const totalInv = rawTot > 0 ? rawTot : (rawCurr > 0 ? rawCurr : 0);
+      const currVal = rawCurr > 0 ? rawCurr : (rawTot > 0 ? rawTot : null);
+
       await updateSaving(saving.id, {
         ...data,
-        currentValue: data.currentValue ? Number(data.currentValue) : null,
+        totalInvestment: totalInv,
+        currentValue: currVal,
         maturityDate: data.maturityDate ? data.maturityDate : null,
       });
       toast.success("Investment updated successfully");

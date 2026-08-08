@@ -40,14 +40,24 @@ export default async function SavingsPage() {
   const savings = JSON.parse(JSON.stringify(rawSavings)) as any[];
 
   // Calculate statistics
-  const totalInvested = savings.reduce((sum, s) => sum + (s.totalInvestment || 0), 0);
-  
   const totalCurrentValuation = savings.reduce((sum, s) => {
-    return sum + (s.currentValue !== null && s.currentValue !== undefined ? s.currentValue : s.totalInvestment);
+    const val = (s.currentValue !== null && s.currentValue !== undefined && s.currentValue > 0)
+      ? s.currentValue
+      : (s.totalInvestment || 0);
+    return sum + val;
+  }, 0);
+
+  const totalInvested = savings.reduce((sum, s) => {
+    const inv = (s.totalInvestment !== null && s.totalInvestment !== undefined && s.totalInvestment > 0)
+      ? s.totalInvestment
+      : (s.currentValue || 0);
+    return sum + inv;
   }, 0);
 
   const monthlyCommitment = savings.reduce((sum, s) => {
     const amt = s.contributionAmount || 0;
+    if (amt <= 0 || s.frequency === "ONE_TIME") return sum;
+    
     switch (s.frequency) {
       case "MONTHLY":
         return sum + amt;
@@ -62,7 +72,9 @@ export default async function SavingsPage() {
     }
   }, 0);
 
-  const totalGainLoss = totalCurrentValuation - totalInvested;
+  // Only calculate gain/loss for items with explicit separate investment and current values
+  const itemsWithGrowth = savings.filter((s) => s.totalInvestment > 0 && s.currentValue > 0 && s.totalInvestment !== s.currentValue);
+  const totalGainLoss = itemsWithGrowth.reduce((sum, s) => sum + (s.currentValue! - s.totalInvestment!), 0);
 
   // Category breakdown
   const categoriesMap: Record<string, { count: number; total: number }> = {};
@@ -71,8 +83,9 @@ export default async function SavingsPage() {
     if (!categoriesMap[cat]) {
       categoriesMap[cat] = { count: 0, total: 0 };
     }
+    const val = (s.currentValue !== null && s.currentValue !== undefined && s.currentValue > 0) ? s.currentValue : (s.totalInvestment || 0);
     categoriesMap[cat].count += 1;
-    categoriesMap[cat].total += s.currentValue ?? s.totalInvestment;
+    categoriesMap[cat].total += val;
   });
 
   const categoryList = Object.entries(categoriesMap).map(([name, data]) => ({
@@ -257,19 +270,27 @@ export default async function SavingsPage() {
                   <CardContent className="space-y-3 pt-0">
                     <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800 text-xs">
                       <div>
-                        <span className="text-muted-foreground block text-[11px]">Periodic Premium</span>
+                        <span className="text-muted-foreground block text-[11px]">
+                          {item.contributionAmount > 0 && item.frequency !== "ONE_TIME" ? "Periodic Premium" : "Contribution Type"}
+                        </span>
                         <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                          {formatIndianCurrency(item.contributionAmount)}
-                          <span className="text-[10px] font-normal text-muted-foreground"> ({freqLabel})</span>
+                          {item.contributionAmount > 0 && item.frequency !== "ONE_TIME" ? (
+                            <>
+                              {formatIndianCurrency(item.contributionAmount)}
+                              <span className="text-[10px] font-normal text-muted-foreground"> ({freqLabel})</span>
+                            </>
+                          ) : (
+                            <span className="text-zinc-600 dark:text-zinc-400 font-medium">Accumulated / One-Time</span>
+                          )}
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground block text-[11px]">Total Invested</span>
-                        <span className="font-semibold">{formatIndianCurrency(item.totalInvestment)}</span>
+                        <span className="text-muted-foreground block text-[11px]">Total Balance / Corpus</span>
+                        <span className="font-semibold">{formatIndianCurrency(item.totalInvestment || item.currentValue || 0)}</span>
                       </div>
                     </div>
 
-                    {item.currentValue && (
+                    {item.currentValue && item.totalInvestment > 0 && item.currentValue !== item.totalInvestment && (
                       <div className="flex items-center justify-between text-xs px-1">
                         <span className="text-muted-foreground">Current Valuation:</span>
                         <span className={`font-bold flex items-center gap-0.5 ${hasGrowth ? "text-emerald-600 dark:text-emerald-400" : ""}`}>

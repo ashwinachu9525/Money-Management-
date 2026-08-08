@@ -96,9 +96,16 @@ export function AddSavingDialog() {
   async function onSubmit(data: SavingFormValues) {
     setIsLoading(true);
     try {
+      const rawTot = Number(data.totalInvestment) || 0;
+      const rawCurr = data.currentValue ? Number(data.currentValue) : 0;
+
+      const totalInv = rawTot > 0 ? rawTot : (rawCurr > 0 ? rawCurr : 0);
+      const currVal = rawCurr > 0 ? rawCurr : (rawTot > 0 ? rawTot : undefined);
+
       await createSaving({
         ...data,
-        currentValue: data.currentValue ? Number(data.currentValue) : undefined,
+        totalInvestment: totalInv,
+        currentValue: currVal,
         maturityDate: data.maturityDate ? data.maturityDate : null,
       });
       toast.success("Savings / Investment added successfully");
@@ -239,9 +246,9 @@ export function AddSavingDialog() {
                 name="contributionAmount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Periodic Premium (₹)</FormLabel>
+                    <FormLabel>Periodic Contribution (₹)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" disabled={isLoading} {...field} />
+                      <Input type="number" step="0.01" placeholder="0 if lump sum / EPF" disabled={isLoading} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -253,9 +260,9 @@ export function AddSavingDialog() {
                 name="totalInvestment"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Total Invested (₹) *</FormLabel>
+                    <FormLabel>Total Invested / Balance (₹)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" disabled={isLoading} {...field} />
+                      <Input type="number" step="0.01" placeholder="e.g. 500000" disabled={isLoading} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -267,7 +274,7 @@ export function AddSavingDialog() {
                 name="currentValue"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Value (₹)</FormLabel>
+                    <FormLabel>Current Valuation (₹)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" placeholder="Optional valuation" disabled={isLoading} {...field} />
                     </FormControl>
