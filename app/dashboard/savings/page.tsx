@@ -56,8 +56,11 @@ export default async function SavingsPage() {
 
   const monthlyCommitment = savings.reduce((sum, s) => {
     const amt = s.contributionAmount || 0;
-    if (amt <= 0 || s.frequency === "ONE_TIME") return sum;
     
+    // Exclude EPF / Employee Provident Fund from monthly out-of-pocket commitments
+    const isEPF = s.category?.toLowerCase().includes("epf") || s.category?.toLowerCase().includes("provident fund");
+    if (isEPF || amt <= 0 || s.frequency === "ONE_TIME") return sum;
+
     switch (s.frequency) {
       case "MONTHLY":
         return sum + amt;

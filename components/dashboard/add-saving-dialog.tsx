@@ -165,7 +165,17 @@ export function AddSavingDialog() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                        if (val?.includes("EPF") || val?.includes("Provident Fund")) {
+                          form.setValue("frequency", "ONE_TIME");
+                          form.setValue("contributionAmount", 0);
+                        }
+                      }}
+                      value={field.value}
+                      disabled={isLoading}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select Category" />
