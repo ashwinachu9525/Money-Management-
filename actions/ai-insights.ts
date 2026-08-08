@@ -45,11 +45,16 @@ export async function generateFinancialInsights() {
   });
 
   const prompt = `
-    Analyze the following anonymized financial data and provide 3 personalized insights.
-    Format your response in clean markdown (bullet points) focusing on:
-    1. Spending habits and category breakdown
-    2. Saving opportunities or budget recommendations
-    3. Goal achievement & EMI payment suggestions
+    Analyze the following anonymized financial data and provide 5-6 short, punchy, highly actionable suggestions and tips.
+    CRITICAL: DO NOT write long paragraphs, essays, or full detailed explanations. Keep each suggestion short, direct, and actionable (1-2 sentences max per bullet point).
+
+    Format requirements:
+    Provide clean bullet points starting with bold action titles:
+    - **💡 Spending Tip**: Short 1-2 sentence tip with exact numbers.
+    - **🎯 Goal Accelerator**: Short 1-2 sentence recommendation.
+    - **🛡️ Emergency Reserve**: Short 1-2 sentence advice.
+    - **💳 Liability Optimiser**: Short 1-2 sentence tip.
+    - **📈 Surplus Deployment**: Short 1-2 sentence tip.
 
     Financial Context:
     - Monthly Income: ₹${totalIncome}
@@ -57,7 +62,7 @@ export async function generateFinancialInsights() {
     - Regular EMI: ₹${totalRegularEMI}
     - Pre-EMI (Construction Loans): ₹${totalPreEmiPayments}
     - Total Liabilities Outflow: ₹${totalEMI}
-    - Calculated Net Savings: ₹${savings}
+    - Calculated Net Surplus: ₹${savings}
     - Category Spending: ${JSON.stringify(categorySpending)}
     - Active Goals Count: ${goals.length}
   `;
